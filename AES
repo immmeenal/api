@@ -1,0 +1,41 @@
+#AES - pip install cryptography for AES
+
+#sudo apt update
+
+#sudo apt install python3
+
+#python3 --version
+
+#sudo apt install python3-pip
+
+#python3 -m pip --version
+
+#python3 -m pip install pycryptodome==3.12.0
+
+
+
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+
+
+def aes_encrypt(message, key):
+    cipher = AES.new(key, AES.MODE_CBC)
+    ct_bytes = cipher.encrypt(pad(message, AES.block_size))
+    iv = cipher.iv
+    return ct_bytes, iv
+
+def aes_decrypt(ct_bytes, key, iv):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    pt = unpad(cipher.decrypt(ct_bytes), AES.block_size)
+    return pt
+
+# Example usage
+key = get_random_bytes(16)  # 128-bit key
+message = b'Hello, AES encryption!'
+ct, iv = aes_encrypt(message, key)
+print("Cipher text:",ct.hex())
+print("Initialization vector:",iv.hex())
+
+decrypted_message = aes_decrypt(ct, key, iv)
+print("Decrypted message:", decrypted_message.decode())
