@@ -1,0 +1,49 @@
+# Diffie-Hellman key exchange algorithm without using APIs.
+
+import random
+
+# Prime modulus
+P = 23
+
+# Generator
+G = 
+
+def generate_private_key():
+    # Generate a random private key
+    return random.randint(1, P - 1)
+
+def generate_public_key(private_key):
+    # Compute public key from private key
+    return pow(G, private_key, P)
+
+def compute_shared_secret(private_key, public_key):
+    # Compute shared secret
+    return pow(public_key, private_key, P)
+
+def main():
+    # Alice generates private key
+    alice_private = generate_private_key()
+    # Bob generates private key
+    bob_private = generate_private_key()
+
+    # Alice computes public key
+    alice_public = generate_public_key(alice_private)
+    # Bob computes public key
+    bob_public = generate_public_key(bob_private)
+
+    # Alice and Bob exchange public keys
+    shared_secret_alice = compute_shared_secret(alice_private, bob_public)
+    shared_secret_bob = compute_shared_secret(bob_private, alice_public)
+
+    # Verify if the shared secrets are equal (should be the same)
+    print("Private key (Alice):", alice_private)
+    print("Private key (Bob):",  bob_private)
+    
+    print("Public key (Alice):", alice_public)
+    print("Public key (Bob):",  bob_public)
+    
+    print("Shared secret (Alice):", shared_secret_alice)
+    print("Shared secret (Bob):", shared_secret_bob)
+
+if __name__ == "__main__":
+    main()
