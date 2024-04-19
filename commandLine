@@ -1,0 +1,40 @@
+Digital Signature:
+openssl genpkey -algorithm RSA -out private_key.pem -aes256
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+openssl dgst -sha256 -sign private_key.pem -out signature.bin message.txt
+openssl dgst -sha256 -verify public_key.pem -signature signature.bin message.txt 
+
+
+RSA:
+openssl genpkey -algorithm RSA -out private_key.pem
+openssl rsa -pubout -in private_key.pem -out public_key.pem
+openssl rsautl -encrypt -pubin -inkey public_key.pem -in plaintext.txt -out encrypted.txt
+openssl rsautl -decrypt -inkey private_key.pem -in encrypted.txt -out decrypted.txt
+
+
+Diffie hillman:
+openssl dhparam -out dhparam.pem 2048
+openssl genpkey -paramfile dhparam.pem -out dh-private-key-A.pem
+openssl genpkey -paramfile dhparam.pem -out dh-private-key-B.pem
+
+openssl pkey -in dh-private-key-A.pem -pubout -out dh-public-key-A.pem
+openssl pkey -in dh-private-key-B.pem -pubout -out dh-public-key-B.pem
+
+openssl pkeyutl -derive -inkey dh-private-key-A.pem -peerkey dh-public-key-B.pem -out shared-secret-A.bin
+openssl pkeyutl -derive -inkey dh-private-key-B.pem -peerkey dh-public-key-A.pem -out shared-secret-B.bin
+
+cmp -s shared-secret-A.bin shared-secret-B.bin && echo "Valid" || echo "Invalid"
+
+
+Aes 
+
+openssl help enc
+openssl enc -list 
+
+openssl enc -aes-256-cbc -in input.txt -out out.bin -e -p -v -salt -debug -k pass -pbkdf2 -z
+
+openssl enc -aes-256-cbc -in out.bin -out decrypted.txt -d -p -v -salt -debug -k pass -pbkdf2 -z
+
+MD5
+
+openssl md5 example.txt
