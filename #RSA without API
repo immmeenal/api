@@ -1,0 +1,80 @@
+#RSA without API 
+
+from Crypto.Util.number import getPrime
+
+def main():
+    # Generate RSA key pair
+    public_key, private_key = generate_key_pair()
+
+    # Original message
+    original_message = "This is a secret message."
+
+    # Encrypt the original message using the public key
+    encrypted_message = encrypt(original_message, public_key)
+
+    # Decrypt the encrypted message using the private key
+    decrypted_message = decrypt(encrypted_message, private_key)
+
+    # Output results
+    print("Original message:", original_message)
+    print("Encrypted message:", encrypted_message)
+    print("Decrypted message:", decrypted_message)
+
+# Generate RSA key pair
+def generate_key_pair():
+    # Generate large prime numbers
+    p = generate_large_prime()
+    q = generate_large_prime()
+
+    # Compute modulus (n)
+    n = p * q
+
+    # Compute totient (phi)
+    phi = (p - 1) * (q - 1)
+
+    # Choose public exponent (e)
+    e = 65537
+
+    # Compute private exponent (d)
+    d = mod_inverse(e, phi)
+
+    return (n, e), (n, d)
+
+# Encrypt message using public key
+def encrypt(message, public_key):
+    n, e = public_key
+    # Convert each character of the message to its ASCII value
+    ascii_values = [ord(char) for char in message]
+    # Encrypt each ASCII value using the public key and convert back to characters
+    encrypted_values = [pow(ascii_val, e, n) for ascii_val in ascii_values]
+    return encrypted_values
+
+# Decrypt message using private key
+def decrypt(encrypted_message, private_key):
+    n, d = private_key
+    # Decrypt each encrypted ASCII value using the private key and convert back to characters
+    decrypted_values = [chr(pow(encrypted_val, d, n)) for encrypted_val in encrypted_message]
+    return ''.join(decrypted_values)
+
+# Generate large prime number
+def generate_large_prime(bits=512):
+    return getPrime(bits)
+
+# Compute modular inverse
+def mod_inverse(a, m):
+    """
+    Computes the modular inverse of 'a' modulo 'm' using the Extended Euclidean Algorithm.
+    """
+    m0, m1 = m, a
+    x0, x1 = 0, 1
+    while m1 != 0:
+        q = m0 // m1
+        m0, m1 = m1, m0 % m1
+        x0, x1 = x1, x0 - q * x1
+    if m0 == 1:
+        return x0 % m
+    else:
+        raise ValueError("Modular inverse does not exist.")
+
+if __name__ == "__main__":
+    main()
