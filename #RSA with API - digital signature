@@ -1,0 +1,65 @@
+#RSA with API - digital signature
+import hashlib
+from Crypto.PublicKey import RSA
+from Crypto.Signature import pkcs1_15
+from Crypto.Hash import SHA256
+from Crypto.Cipher import PKCS1_OAEP
+
+def main():
+    # Generate key pair
+    key_pair = generate_key_pair()
+
+    # Original message
+    original_message = "This is a secret message."
+
+    # Encrypt the original message using the public key
+    encrypted_message = encrypt(original_message, key_pair["public"])
+
+    # Decrypt the encrypted message using the private key
+    decrypted_message = decrypt(encrypted_message, key_pair["private"])
+
+    # Generate a digital signature
+    digital_signature = sign(original_message, key_pair["private"])
+
+    # Verify the digital signature
+    is_verified = verify(original_message, digital_signature, key_pair["public"])
+
+    # Output results
+    print("Original message:", original_message)
+    print("Encrypted message:", encrypted_message.hex())
+    print("Decrypted message:", decrypted_message)
+    print("Digital signature:", digital_signature.hex())
+    print("Signature verified:", is_verified)
+
+# Generate RSA key pair
+def generate_key_pair():
+    key = RSA.generate(2048)  # Key size
+    return {"public": key.public_key(), "private": key}
+
+# Encrypt message using public key
+def encrypt(message, public_key):
+    cipher = PKCS1_OAEP.new(public_key)
+    return cipher.encrypt(message.encode())
+
+# Decrypt message using private key
+def decrypt(ciphertext, private_key):
+    cipher = PKCS1_OAEP.new(private_key)
+    return cipher.decrypt(ciphertext).decode()
+
+# Sign message using private key
+def sign(message, private_key):
+    hash_obj = SHA256.new(message.encode())
+    signature = pkcs1_15.new(private_key).sign(hash_obj)
+    return signature
+
+# Verify message using public key and digital signature
+def verify(message, digital_signature, public_key):
+    hash_obj = SHA256.new(message.encode())
+    try:
+        pkcs1_15.new(public_key).verify(hash_obj, digital_signature)
+        return True
+    except (ValueError, TypeError):
+        return False
+
+if __name__ == "__main__":
+    main()
