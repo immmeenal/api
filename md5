@@ -1,0 +1,12 @@
+import hashlib
+
+# Take input from the user
+input_string = input("Enter a message: ")
+
+# Encode the message using the hashlib library with UTF-8 encoding
+output = hashlib.md5(input_string.encode('utf-8'))
+
+# Print the hash function
+print("Hash of the input string:")
+print(output.hexdigest())
+
