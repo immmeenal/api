@@ -1,0 +1,41 @@
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from Crypto.Util.Padding import pad, unpad
+
+def aes_encrypt(message, key, mode, iv=None):
+    if mode == AES.MODE_ECB:
+        cipher = AES.new(key, mode)
+    else:
+        cipher = AES.new(key, mode, iv=iv)
+    ct_bytes = cipher.encrypt(pad(message, AES.block_size))
+    return ct_bytes, cipher.iv if iv else None
+
+def aes_decrypt(ct_bytes, key, mode, iv=None):
+    if mode == AES.MODE_ECB:
+        cipher = AES.new(key, mode)
+    else:
+        cipher = AES.new(key, mode, iv=iv)
+    pt = unpad(cipher.decrypt(ct_bytes), AES.block_size)
+    return pt
+
+# Get user input for cipher mode
+def get_cipher_mode():
+    while True:
+        mode = input("Enter cipher mode (ECB, CBC, CFB): ").upper()
+        if mode in ["ECB", "CBC", "CFB"]:
+            return getattr(AES, f"MODE_{mode}")
+        else:
+            print("Invalid input. Please enter ECB, CBC, or CFB.")
+
+# Example usage
+key = get_random_bytes(16)  # 128-bit key
+message = b'Hello, AES encryption!'
+
+mode = get_cipher_mode()
+iv = None if mode == AES.MODE_ECB else get_random_bytes(AES.block_size)
+ct, iv = aes_encrypt(message, key, mode, iv)
+print("Cipher text:", ct.hex())
+print("Initialization vector:", iv.hex() if iv else "N/A")
+
+decrypted_message = aes_decrypt(ct, key, mode, iv)
+print("Decrypted message:", decrypted_message.decode())
